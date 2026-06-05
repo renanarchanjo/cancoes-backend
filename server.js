@@ -322,7 +322,7 @@ app.post("/api/webhooks/kie", async (req, res) => {
   const taskId = body.taskId || body.data?.taskId;
   const status = body.status || body.data?.status;
   const sunoData = body.data?.response?.sunoData?.[0] || body.response?.sunoData?.[0];
-  console.log("KIE webhook:", taskId, status);
+  console.log("KIE webhook body:", JSON.stringify(body).slice(0, 500));
   if (taskId && (status === "SUCCESS" || status === "FIRST_SUCCESS") && sunoData?.audioUrl) {
     const { data: rows } = await supabase.from("orders").select("*").contains("kie_task_ids", [taskId]);
     if (rows && rows.length > 0) {
