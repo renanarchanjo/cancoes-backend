@@ -85,7 +85,7 @@ function buildSunoPayload(order, letra) {
     title: `Homenagem para ${name}`.slice(0, 80),
     customMode: true,
     instrumental: false,
-    model: "V4_5",
+    model: "V5",
     vocalGender: voice === "Masculina" ? "m" : "f",
     callBackUrl,
   };
