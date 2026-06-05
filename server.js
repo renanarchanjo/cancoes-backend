@@ -120,7 +120,18 @@ app.post("/api/orders/:id/generate", async (req, res) => {
   try {
     // Gera letra com Claude
     const letra = await gerarLetraComClaude(order);
-    order.lyrics = letra || buildLetraPadrao(order);
+    const letraBruta = letra || buildLetraPadrao(order);
+    order.lyrics = letraBruta
+      .replace(/^#[^
+]*
+?/gm, '')
+      .replace(/\[(Verso|Refrão|Refrao|Pre-refrão|Pré-refrão|Ponte|Bridge|Chorus|Verse|Intro|Outro)[^\]]*\]
+?/gi, '')
+      .replace(/
+{3,}/g, '
+
+')
+      .trim();
     order.generationStatus = "generating";
     orders.set(order.id, order);
 
