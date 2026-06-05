@@ -189,6 +189,25 @@ app.get("/api/orders/:id/download", async (req, res) => {
   return res.redirect(302, order.audioUrl);
 });
 
+app.post("/api/payments/infinitepay/confirm", async (req, res) => {
+  const { orderId, transactionNsu, slug } = req.body;
+  if (!orderId) return res.json({ ok: false });
+  try {
+    const order = await getOrder(orderId);
+    if (!order || order.paymentStatus === "paid") return res.json({ ok: true });
+    const r = await fetch("https://api.checkout.infinitepay.io/payment_check", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ handle: INFINITEPAY_HANDLE, order_nsu: orderId.replace("CN-", ""), transaction_nsu: transactionNsu, slug }),
+    });
+    const d = await r.json();
+    if (d.paid) {
+      order.paymentStatus = "paid"; order.transactionNsu = transactionNsu;
+      await saveOrder(order); console.log("Pagamento confirmado via redirect:", orderId);
+    }
+  } catch (e) { console.warn("confirm erro:", e.message); }
+  return res.json({ ok: true });
+});
+
 app.post("/api/analytics/events", (req, res) => { return res.json({ ok: true }); });
 
 app.listen(PORT, () => console.log(`Cancoes backend porta ${PORT}`));
