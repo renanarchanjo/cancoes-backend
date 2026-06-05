@@ -63,7 +63,7 @@ app.post("/api/orders/:id/generate", async (req, res) => {
   if (!order) return res.status(404).json({ error: "Pedido não encontrado." });
   const { prompt, style, title } = buildSunoPrompt(order);
   try {
-    const kieRes = await fetch(`${KIE_BASE}/api/v1/generate`, { method: "POST", headers: { "Authorization": `Bearer ${KIE_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ prompt, style, title, customMode: true, instrumental: false, model: "V4", vocalGender: order.voice === "Masculina" ? "m" : "f" }) });
+    const kieRes = await fetch(`${KIE_BASE}/api/v1/generate`, { method: "POST", headers: { "Authorization": `Bearer ${KIE_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ prompt, style, title, customMode: true, instrumental: false, model: "V4", vocalGender: order.voice === "Masculina" ? "m" : "f", callBackUrl: (process.env.BACKEND_URL || "https://cancoes-backend.onrender.com") + "/api/webhooks/kie" }) });
     const kieData = await kieRes.json();
     if (!kieRes.ok || !kieData.data?.taskId) throw new Error(kieData.msg || "Erro ao iniciar geração");
     order.kieTaskId = kieData.data.taskId;
@@ -108,7 +108,7 @@ app.post("/api/orders/:id/remake", async (req, res) => {
   orders.set(order.id, order);
   const { prompt, style, title } = buildSunoPrompt(order);
   try {
-    const kieRes = await fetch(`${KIE_BASE}/api/v1/generate`, { method: "POST", headers: { "Authorization": `Bearer ${KIE_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ prompt, style, title, customMode: true, instrumental: false, model: "V4", vocalGender: order.voice === "Masculina" ? "m" : "f" }) });
+    const kieRes = await fetch(`${KIE_BASE}/api/v1/generate`, { method: "POST", headers: { "Authorization": `Bearer ${KIE_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ prompt, style, title, customMode: true, instrumental: false, model: "V4", vocalGender: order.voice === "Masculina" ? "m" : "f", callBackUrl: (process.env.BACKEND_URL || "https://cancoes-backend.onrender.com") + "/api/webhooks/kie" }) });
     const kieData = await kieRes.json();
     if (!kieRes.ok || !kieData.data?.taskId) throw new Error(kieData.msg || "Erro remake");
     order.kieTaskId = kieData.data.taskId; order.generationStatus = "generating";
