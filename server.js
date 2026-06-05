@@ -115,7 +115,7 @@ app.post("/api/payments/cartpanda/checkout", async (req, res) => {
   if (!order) return res.status(404).json({ error: "Pedido nao encontrado." });
   const total = OFFER_PRICE + (instantDelivery ? BUMP_PRICE : 0);
   try {
-    const r = await fetch("https://api.checkout.infinitepay.io/links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: INFINITEPAY_HANDLE, redirect_url: `${process.env.FRONTEND_URL || "https://kitpopozuda.site"}/?retorno=cartpanda&pedido=${order.id}`, webhook_url: `${BACKEND_URL}/api/webhooks/infinitepay`, order_nsu: order.id.replace("CN-", ""), items: [{ quantity: 1, price: total, description: `Musica - Pedido ${order.id}` }] }) });
+    const r = await fetch("https://api.checkout.infinitepay.io/links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: INFINITEPAY_HANDLE, redirect_url: `${process.env.FRONTEND_URL || "https://kitpopozuda.site"}/?retorno=infinitepay&pedido=${order.id}`, webhook_url: `${BACKEND_URL}/api/webhooks/infinitepay`, order_nsu: order.id.replace("CN-", ""), items: [{ quantity: 1, price: total, description: `Musica - Pedido ${order.id}` }] }) });
     const d = await r.json();
     if (!r.ok || !d.url) throw new Error(d.message || "Erro InfinitePay");
     order.cartpandaCheckoutUrl = d.url; order.customerName = name; order.customerEmail = email; order.customerPhone = phone; order.instantDelivery = Boolean(instantDelivery);
@@ -161,7 +161,7 @@ app.post("/api/orders/:id/lyrics-art/payments/cartpanda/checkout", async (req, r
   let order = await getOrder(req.params.id);
   if (!order) return res.status(404).json({ error: "Pedido nao encontrado." });
   try {
-    const r = await fetch("https://api.checkout.infinitepay.io/links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: INFINITEPAY_HANDLE, redirect_url: `${process.env.FRONTEND_URL || "https://kitpopozuda.site"}/?retorno=cartpanda&tipo=lyrics-art&pedido=${order.id}`, webhook_url: `${BACKEND_URL}/api/webhooks/infinitepay-art`, order_nsu: `${order.id.replace("CN-", "")}-art`, items: [{ quantity: 1, price: LYRICS_ART_PRICE, description: `Arte letra - ${order.id}` }] }) });
+    const r = await fetch("https://api.checkout.infinitepay.io/links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: INFINITEPAY_HANDLE, redirect_url: `${process.env.FRONTEND_URL || "https://kitpopozuda.site"}/?retorno=infinitepay&tipo=lyrics-art&pedido=${order.id}`, webhook_url: `${BACKEND_URL}/api/webhooks/infinitepay-art`, order_nsu: `${order.id.replace("CN-", "")}-art`, items: [{ quantity: 1, price: LYRICS_ART_PRICE, description: `Arte letra - ${order.id}` }] }) });
     const d = await r.json();
     if (!r.ok || !d.url) throw new Error(d.message || "Erro arte");
     order.lyricsArtCheckoutUrl = d.url; await saveOrder(order);
