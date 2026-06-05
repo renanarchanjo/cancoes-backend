@@ -119,7 +119,7 @@ app.post("/api/orders/:id/generate", async (req, res) => {
 
   try {
     // Gera letra com Claude
-    const letra = await gerarLetraComClaude(order);
+    console.log("Gerando letra Claude para:", order.id); const letra = await gerarLetraComClaude(order);
     order.lyrics = letra || buildLetraPadrao(order);
     order.generationStatus = "generating";
     orders.set(order.id, order);
@@ -132,7 +132,7 @@ app.post("/api/orders/:id/generate", async (req, res) => {
       dispararGeracao(payload),
     ]).then(results => results.map(r => r.status === "fulfilled" ? r.value : null));
 
-    order.kieTaskIds = [taskId1, taskId2].filter(Boolean);
+    console.log("KIE taskIds:", taskId1, taskId2); order.kieTaskIds = [taskId1, taskId2].filter(Boolean);
     orders.set(order.id, order);
     return res.json({ order });
   } catch (err) {
