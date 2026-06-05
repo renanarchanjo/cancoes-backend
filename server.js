@@ -42,7 +42,7 @@ Requisitos:
 - Use detalhes específicos da história
 - Tom emotivo e pessoal
 - Máximo 300 palavras
-- Retorne APENAS a letra, sem explicações`;
+- Retorne APENAS a letra limpa, sem marcadores como [Verso], [Refrão], [Ponte], sem títulos com #, sem asteriscos. Só o texto dos versos separados por linha em branco.`;
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -120,18 +120,7 @@ app.post("/api/orders/:id/generate", async (req, res) => {
   try {
     // Gera letra com Claude
     const letra = await gerarLetraComClaude(order);
-    const letraBruta = letra || buildLetraPadrao(order);
-    order.lyrics = letraBruta
-      .replace(/^#[^
-]*
-?/gm, '')
-      .replace(/\[(Verso|Refrão|Refrao|Pre-refrão|Pré-refrão|Ponte|Bridge|Chorus|Verse|Intro|Outro)[^\]]*\]
-?/gi, '')
-      .replace(/
-{3,}/g, '
-
-')
-      .trim();
+    order.lyrics = letra || buildLetraPadrao(order);
     order.generationStatus = "generating";
     orders.set(order.id, order);
 
